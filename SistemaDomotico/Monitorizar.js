@@ -1,4 +1,18 @@
 ﻿/**
+ * @enumerable {TipoEquipamento} contem todos os tipos de equipamentos que existem no Sistema Domotico
+ */
+var TipoEquipamento = {
+    TM: "Termometro",
+    AC: "Ar Condicionado",
+    DM: "Detetor de Movimento",
+    GM: "Gerador de Movimento",
+    DF: "Detetor de fecho de Porta",
+    TE: "Trinco Eletrico",
+    EE: "Detetor de Posicao em Estore Eletrico",
+    ME: "Motor Eletrico de Estore"
+};
+
+/**
  * Closure auxiliar que é usada como contador por outras funcoes, 
  * nomeadamente para a atribuicao de id's aos elementos que sao criados.
  */
@@ -53,9 +67,9 @@ Tabela.prototype.celula = function (linha, coluna) {
  * @param  {titulo} titulo que sera dado ao Atuador
  * @extends {Equipamento}
  */
-function Atuador(titulo) {
-    Equipamento.call(this, titulo);
-    this.titulo = titulo;
+function Atuador(nome) {
+    Equipamento.call(this, nome);
+    this.nome = nome;
 }
 Atuador.prototype = Object.create(Equipamento.prototype);
 Atuador.prototype.constructor = Atuador;
@@ -64,9 +78,9 @@ Atuador.prototype.constructor = Atuador;
  * @param  {titulo} titulo que sera dado ao AtuadorLocal
  * @extends {Atuador}
  */
-function AtuadorLocal(titulo) {
-    Atuador.call(this, titulo);
-    this.titulo = titulo;
+function AtuadorLocal(nome) {
+    Atuador.call(this, nome);
+    this.nome = nome;
 }
 AtuadorLocal.prototype = Object.create(Atuador.prototype);
 AtuadorLocal.prototype.constructor = AtuadorGlobal;
@@ -75,9 +89,9 @@ AtuadorLocal.prototype.constructor = AtuadorGlobal;
  * @param  {titulo} titulo que sera dado ao AtuadorGlobal
  * @extends {Atuador}
  */
-function AtuadorGlobal(titulo) {
-    Atuador.call(this, titulo);
-    this.titulo = titulo;
+function AtuadorGlobal(nome) {
+    Atuador.call(this, nome);
+    this.nome = nome;
 }
 AtuadorGlobal.prototype = Object.create(Atuador.prototype);
 AtuadorGlobal.prototype.constructor = AtuadorGlobal;
@@ -89,12 +103,13 @@ AtuadorGlobal.prototype.constructor = AtuadorGlobal;
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function Termometro(titulo, imagem) {
-    titulo = titulo || "TM";
-    imagem = imagem || "../images/termometro.png";
-    Equipamento.call(this, titulo);
-    AtuadorGlobal.call(this, titulo);
-    this.imagem = imagem;
+function Termometro(nome, estado) {
+    nome = nome || "TM";
+    estado = estado || "25ºC";
+    Equipamento.call(this, nome);
+    AtuadorGlobal.call(this, nome);
+    this.estado = estado;
+    Termometro.prototype.criarTermometro.call(this);
 }
 Termometro.prototype = Object.create(Equipamento.prototype);
 Termometro.prototype = Object.create(AtuadorGlobal.prototype);
@@ -104,10 +119,10 @@ Termometro.prototype.constructor = Termometro;
  * Funcao que cria um termometro, criando um div que contem um label, para mostrar a temperatura,
  * e a sua imagem respetiva.
  */
-Termometro.prototype.adicionarTermometro = function () {
-    var div = divEquipamento("divTer", "pTer", "termometro", "25ºC");
+Termometro.prototype.criarTermometro = function () {
+    var div = divEquipamento("divTer", "pTer", "termometro", this.estado);
     var img = document.createElement("img");
-    img.src = this.imagem;
+    img.src = "../images/termometro.png";
     div.appendChild(img);
     divSistema().appendChild(div);
 }
@@ -119,12 +134,13 @@ Termometro.prototype.adicionarTermometro = function () {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function ArCondicionado(titulo, imagem) {
-    titulo = titulo || "AC";
-    imagem = imagem || "../images/arCondicionado.png";
-    Equipamento.call(this, titulo);
-    AtuadorGlobal.call(this, titulo);
-    this.imagem = imagem;
+function ArCondicionado(nome, estado) {
+    nome = nome || "AC";
+    estado = estado || "25ºC";
+    Equipamento.call(this, nome);
+    AtuadorGlobal.call(this, nome);
+    this.estado = estado;
+    ArCondicionado.prototype.criarArCondicionado.call(this);
 }
 ArCondicionado.prototype = Object.create(Equipamento.prototype);
 ArCondicionado.prototype.constructor = ArCondicionado;
@@ -133,7 +149,7 @@ ArCondicionado.prototype = Object.create(AtuadorGlobal.prototype);
 /**
  * funcao que cria um ar condicionado 
  */
-ArCondicionado.prototype.adicionarArCondicionado = function () {
+ArCondicionado.prototype.criarArCondicionado = function () {
     var div = divEquipamento("divAr", "");
     var p = document.createElement("p");
     p.id = "pAr" + add();
@@ -142,8 +158,8 @@ ArCondicionado.prototype.adicionarArCondicionado = function () {
         criarinputArCondicionado(this.id, this.className);//sempre que se carrega no <p> este muda para <input> para se poder adicionar a nova temperatura
     }
     var img = document.createElement("img");
-    img.src = this.imagem;
-    p.appendChild(document.createTextNode("25ºC"));
+    img.src = "../images/arCondicionado.png";
+    p.appendChild(document.createTextNode(this.estado));
     div.appendChild(p);
     div.appendChild(img);
     divSistema().appendChild(div);
@@ -200,21 +216,22 @@ function criarPArCondicionado(clickedId, clickedClassName) {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function GeradorDeMovimento(titulo, imagem) {
-    titulo = titulo || "GM";
-    imagem = imagem || "../images/semMovimento.png";
+function GeradorDeMovimento(nome, estado) {
+    nome = nome || "GM";
+    estado = estado || "../images/semMovimento.png";
     Equipamento.call(this);
     AtuadorGlobal.call(this);
-    this.imagem = imagem;
+    this.estado = estado;
+    GeradorDeMovimento.prototype.criarGeradorMovimento.call(this);
 }
 GeradorDeMovimento.prototype = Object.create(Equipamento.prototype);
 GeradorDeMovimento.prototype.constructor = GeradorDeMovimento;
 GeradorDeMovimento.prototype = Object.create(AtuadorGlobal.prototype);
 
-GeradorDeMovimento.prototype.adicionarGeradorMovimento = function () {
+GeradorDeMovimento.prototype.criarGeradorMovimento = function () {
     var div = divEquipamento("divGerMov", "pGerMov", "classGerMov", "");
     var img = document.createElement("img");
-    img.src = "../images/semMovimento.png";
+    img.src = this.estado;
     img.id = "imgGerMov" + add();
     img.className = "movimentoDesativado";
     img.onclick = function () {
@@ -295,12 +312,13 @@ GeradorDeMovimento.prototype.desligarLampadas = function () {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function DetetorDeMovimento(titulo, imagem) {
-    titulo = titulo || "DM";
-    imagem = imagem || "../images/movimentoOff.png";
+function DetetorDeMovimento(nome, estado) {
+    nome = nome || "DM";
+    estado = estado || "../images/movimentoOff.png";
     Equipamento.call(this);
     AtuadorGlobal.call(this);
-    this.imagem = imagem;
+    this.estado = estado;
+    DetetorDeMovimento.prototype.criarDetetorDeMovimento.call(this);
 }
 DetetorDeMovimento.prototype = Object.create(Equipamento.prototype);
 DetetorDeMovimento.prototype.constructor = DetetorDeMovimento;
@@ -310,10 +328,10 @@ DetetorDeMovimento.prototype = Object.create(AtuadorGlobal.prototype);
  * funcao que cria uma lampadas
  * @member {DetetorDeMovimento}
  */
-DetetorDeMovimento.prototype.criarLampada = function () {
+DetetorDeMovimento.prototype.criarDetetorDeMovimento = function () {
     var div = divEquipamento("divMovOff", "DM", "detetorMov", "");
     var img = document.createElement("img");
-    img.src = "../images/movimentoOff.png";
+    img.src = this.estado;
     img.className = "movimentoOff";
     div.appendChild(img);
     divSistema().appendChild(div);
@@ -326,12 +344,13 @@ DetetorDeMovimento.prototype.criarLampada = function () {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function TrincoEletrico(titulo, imagem) {
-    titulo = titulo || "TE";
-    imagem = imagem || "../images/fechoAberto.png";
+function TrincoEletrico(nome, estado) {
+    nome = nome || "TE";
+    estado = estado || "../images/fechoFechado.png";
     Equipamento.call(this);
     AtuadorLocal.call(this);
-    this.imagem = imagem;
+    this.estado = estado;
+    TrincoEletrico.prototype.criarTrincoEletrico.call(this);
 }
 TrincoEletrico.prototype = Object.create(Equipamento.prototype);
 TrincoEletrico.prototype.constructor = TrincoEletrico;
@@ -348,7 +367,7 @@ TrincoEletrico.prototype.criarTrincoEletrico = function () {
     p.className = "trincoEletrico";
     var imagem = document.createElement("img");
     imagem.id = "imgTriEle" + add();
-    imagem.src = "../images/fechoAberto.png";
+    imagem.src = this.estado;
     imagem.className = "trincoLigado";
     imagem.onclick = function () {
         TrincoEletrico.prototype.alterarTrincoEletricoAberto.call(this, this.id);
@@ -373,7 +392,7 @@ TrincoEletrico.prototype.criarDropdownTrincoEletrico = function (pClickedId) {
     var parent = document.getElementById(p.parentNode.id);
     var select = document.createElement("select");
     select.id = "select" + add();
-    var lista = document.getElementsByClassName("equipamentoFechoAberto");
+    var lista = document.getElementsByClassName("equipamentoFechoFechado");
     var option;
     for (var i = 0; i < lista.length; i++) {
         option = document.createElement("option");
@@ -453,12 +472,13 @@ function abrirFecharPorta(clickedId, source) {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function DetetorFecho(titulo, imagem) {
-    titulo = titulo || "DF";
-    imagem = imagem || "../images/portaAberta.png";
+function DetetorFecho(nome, estado) {
+    nome = nome || "DF";
+    estado = estado || "../images/portaFechada.png";
     Equipamento.call(this);
     AtuadorLocal.call(this);
-    this.imagem = imagem;
+    this.estado = estado;
+    DetetorFecho.prototype.criarDetetorFecho.call(this);
 }
 DetetorFecho.prototype = Object.create(Equipamento.prototype);
 DetetorFecho.prototype.constructor = DetetorFecho;
@@ -468,12 +488,12 @@ DetetorFecho.prototype = Object.create(AtuadorLocal.prototype);
  * funcao que cria um detetor de fecho (portas)
  * @member {DetetorFecho}
  */
-DetetorFecho.prototype.criarDetetorFechoAberto = function () {
+DetetorFecho.prototype.criarDetetorFecho = function () {
     var div = divEquipamento("divDetFec", "pDetFec", "classDetFec", "");
     var img = document.createElement("img");
-    img.src = "../images/portaAberta.png";
+    img.src = this.estado;
     img.id = "imgDetFec" + add();
-    img.className = "equipamentoFechoAberto";
+    img.className = "equipamentoFechoFechado";
     div.appendChild(img);
     divSistema().appendChild(div);
 }
@@ -485,12 +505,13 @@ DetetorFecho.prototype.criarDetetorFechoAberto = function () {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function DetetorPosicaoEstoreEletrico(titulo, imagem) {
-    titulo = titulo || "EE";
-    imagem = imagem || "../images/start.png";
-    Equipamento.call(this, titulo);
-    AtuadorLocal.call(this, titulo);
-    this.imagem = imagem;
+function DetetorPosicaoEstoreEletrico(nome, estado) {
+    nome = nome || "EE";
+    estado = estado || "../images/start.png";
+    Equipamento.call(this, nome);
+    AtuadorLocal.call(this, nome);
+    this.estado = estado;
+    DetetorPosicaoEstoreEletrico.prototype.criarDetetorPosicaoEstoreEletrico.call(this);
 }
 DetetorPosicaoEstoreEletrico.prototype = Object.create(Equipamento.prototype);
 DetetorPosicaoEstoreEletrico.prototype.constructor = DetetorPosicaoEstoreEletrico;
@@ -534,7 +555,7 @@ DetetorPosicaoEstoreEletrico.prototype.criarDetetorPosicaoEstoreEletrico = funct
     p2.id = "pDetPosEst" + add();
     p2.textContent = "Aberto";
     var img = document.createElement("img");
-    img.src = this.imagem;
+    img.src = "../images/start.png";
     img.id = "start" + add();
     img.className = "start";
     div.appendChild(p1);
@@ -697,12 +718,13 @@ function valor2(idImagem) {
  * @extends {Equipamento}
  * @extends {AtuadorGlobal}
  */
-function MotorEletricoEstore(titulo, imagem) {
-    titulo = titulo || "ME";
-    imagem = imagem || "../images/aberto.png";
+function MotorEletricoEstore(nome, estado) {
+    nome = nome || "ME";
+    estado = estado || "../images/aberto.png";
     Equipamento.call(this);
     AtuadorLocal.call(this);
-    this.imagem = imagem;
+    this.estado = estado;
+    MotorEletricoEstore.prototype.criarMotorEletricoEstore.call(this);
 }
 MotorEletricoEstore.prototype = Object.create(Equipamento.prototype);
 MotorEletricoEstore.prototype.constructor = MotorEletricoEstore;
@@ -711,7 +733,7 @@ MotorEletricoEstore.prototype = Object.create(AtuadorLocal.prototype);
 MotorEletricoEstore.prototype.criarMotorEletricoEstore = function () {
     var div = divEquipamento("divMotEleEst", "pMotEleEst", "classMotEleEst", "");
     var img = document.createElement("img");
-    img.src = this.imagem;
+    img.src = this.estado;
     img.id = "imgMotEleEst" + add();
     img.className = "janela";
     div.appendChild(img);
@@ -771,17 +793,17 @@ function Painel(linhas, colunas) {
 Painel.prototype = Object.create(Tabela.prototype);
 Painel.prototype.constructor = Painel;
 
-Painel.prototype.colocar = function (linha, coluna, equipamento) {
-    if ((linha >= 0) && (linha < this.linhas)
-        && (coluna >= 0) && (coluna < this.colunas)
-        && ((equipamento === void 0) || (equipamento instanceof Equipamento))) {
-        this.equipamentos[linha][coluna] = equipamento;
-        if (equipamento) {
-            equipamento.prototype.apresentarEquipamento(this.celula(linha, coluna));
-        } else {
-            (this.apresentarEquipamento(this.celula(linha, coluna)));
-        }
-    }
+Painel.prototype.colocar = function (equipamento) {
+    // if ((linha >= 0) && (linha < this.linhas)
+    //     && (coluna >= 0) && (coluna < this.colunas)
+    //     && ((equipamento === void 0) || (equipamento instanceof Equipamento))) {
+    //     // this.equipamentos[linha][coluna] = equipamento;
+    //     if (equipamento) {
+    //         equipamento.prototype.apresentarEquipamento(this.celula(linha, coluna));
+    //     } else {
+    //         (this.apresentarEquipamento(this.celula(linha, coluna)));
+    //     }
+    // }
     return this;
 }
 
@@ -799,21 +821,21 @@ function apresentarEquipamentos(arrayEquipamentos) {
         var str = "((painel";
         for (var i = 0; i < arrayEquipamentos.length; i++) {
             if (arrayEquipamentos[i].titulo.substring(0, 2) === "TM") {
-                str += ".colocar(new Termometro().adicionarTermometro())";
+                str += ".colocar(new Termometro())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "AC") {
-                str += ".colocar(new ArCondicionado().adicionarArCondicionado())";
+                str += ".colocar(new ArCondicionado())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "DM") {
-                str += ".colocar(new DetetorDeMovimento().criarLampada())";
+                str += ".colocar(new DetetorDeMovimento())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "GM") {
-                str += ".colocar(new GeradorDeMovimento().adicionarGeradorMovimento())";
+                str += ".colocar(new GeradorDeMovimento())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "DF") {
-                str += ".colocar(new DetetorFecho().criarDetetorFechoAberto())";
+                str += ".colocar(new DetetorFecho())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "TE") {
-                str += ".colocar(new TrincoEletrico().criarTrincoEletrico())";
+                str += ".colocar(new TrincoEletrico())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "EE") {
-                str += ".colocar(new DetetorPosicaoEstoreEletrico().criarDetetorPosicaoEstoreEletrico())";
+                str += ".colocar(new DetetorPosicaoEstoreEletrico())";
             } else if (arrayEquipamentos[i].titulo.substring(0, 2) === "ME") {
-                str += ".colocar(new MotorEletricoEstore().criarMotorEletricoEstore())";
+                str += ".colocar(new MotorEletricoEstore())";
             }
         }
         str += ").apresentarEquipamento(document.getElementById(div)));";
