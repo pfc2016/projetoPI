@@ -1,0 +1,39 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="SistemaDomotico.master.cs" Inherits="SistemaDomotico.SistemaDomotico" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>MASTER PAGE</title>
+
+    <link href="Content/domoticoStyle.css" rel="stylesheet" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <div id="content" class="divContent">
+        <form id="form1" runat="server">
+            <div id="">
+
+                <asp:LinkButton Text="Home" runat="server" Width="100px" BackColor="Black"
+                    ForeColor="White" Font-Underline="false"
+                    OnClientClick="home();return false" />
+                <div id="monitorizar">
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+    <script type="text/javascript">
+        function home() {
+            window.location.href = '../consola.aspx';
+
+        }
+    </script>
+
+</body>
+</html>
